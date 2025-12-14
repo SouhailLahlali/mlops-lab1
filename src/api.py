@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import uuid
 
 """
 API FastAPI de prédiction de churn pour le lab MLOps.
@@ -266,6 +266,8 @@ def predict(req: PredictRequest) -> dict[str, Any]:
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+    # Génération automatique de request_id si non fourni
+    request_id = req.request_id or str(uuid.uuid4())
 
     # Normalisation minimale côté API (cohérente avec le prétraitement)
     features = {
@@ -293,7 +295,7 @@ def predict(req: PredictRequest) -> dict[str, Any]:
 
 
     out: dict[str, Any] = {
-        "request_id": req.request_id,
+        "request_id": request_id,
         "model_version": model_name,
         "prediction": pred,
         "probability": round(proba, 6),
